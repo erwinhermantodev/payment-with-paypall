@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6pBnbvNm9aI&eaDk3m"
+      crossorigin="anonymous"
+    />
+    <title>Payment Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message"></div>
+    <form action="/processPayment" method="post">
+      <h1>Payment Form</h1>
+      <div>
+        <label for="amount">Price (amount): </label>
+        <input type="text" id="amount" name="amount" required />
+      </div>
+      <div>
+        <label for="currency">Currency: </label>
+        <select id="currency" name="currency" required>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="THB">THB</option>
+          <option value="HKD">HKD</option>
+          <option value="SGD">SGD</option>
+          <option value="AUD">AUD</option>
+        </select>
+      </div>
+      <div>
+        <label for="fullName">Customer Full name: </label>
+        <input type="text" id="fullName" name="fullName" required />
+      </div>
+      <div>
+        <h2>Payment Section</h2>
+        <label for="cardHolderName">Credit card holder name: </label>
+        <input type="text" id="cardHolderName" name="cardHolderName" required />
+        <label for="cardNumber">Credit card number: </label>
+        <input type="text" id="cardNumber" name="cardNumber" required />
+        <label for="expirationMonth">Credit card expiration month: </label>
+        <input
+          type="text"
+          id="expirationMonth"
+          name="expirationMonth"
+          required
+        />
+        <label for="expirationYear">Credit card expiration year: </label>
+        <input type="text" id="expirationYear" name="expirationYear" required />
+        <label for="cvv">Credit card CVV: </label>
+        <input type="text" id="cvv" name="cvv" required />
+      </div>
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </body>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector("form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        // Clear previous messages
+        document.getElementById("message").innerHTML = "";
+
+        // Capture form data and convert to JSON
+        const formData = new FormData(form);
+        const formDataJson = {};
+        formData.forEach((value, key) => {
+          formDataJson[key] = value;
+        });
+
+        // Log form data JSON to the console for debugging
+        console.log("Form Data JSON:", formDataJson);
+
+        // Your existing form submission logic
+        const response = await fetch("/processPayment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDataJson),
+        });
+
+        const result = await response.json();
+
+        // Display success or error message
+        const messageDiv = document.getElementById("message");
+        const messageElement = document.createElement("div");
+        messageElement.textContent = result.message;
+
+        if (result.success) {
+          messageElement.classList.add("alert", "alert-success");
+        } else {
+          messageElement.classList.add("alert", "alert-danger");
+        }
+
+        messageDiv.appendChild(messageElement);
+      });
+    });
+  </script>
+</html>
